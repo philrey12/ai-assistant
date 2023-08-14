@@ -1,11 +1,14 @@
 from langchain import OpenAI, LLMChain, PromptTemplate
 from langchain.memory import ConversationBufferWindowMemory
+import os
 from dotenv import find_dotenv, load_dotenv
 import requests
 from playsound import playsound
-import os
 
 load_dotenv(find_dotenv())
+
+eleven_labs_api_key = ''
+eleven_labs_api_key == os.getenv('ELEVEN_LABS_API_KEY')
 
 def ai_response(human_input):
     template = """
@@ -33,8 +36,33 @@ def ai_response(human_input):
     )
 
     output = chatgpt_chain.predict(human_input=human_input)
-
     return output
+
+def voice_message(message):
+    url = "https://api.elevenlabs.io/v1/text-to-speech/bZkifB8UZDN5bvyYpnsD"
+
+    data = {
+        "text": message,
+        "model_id": "eleven_monolingual_v1",
+        "voice_settings": {
+            "stability": 0.5,
+            "similarity_boost": 0.5
+        }
+    }
+
+    headers = {
+        "Accept": "audio/mpeg",
+        "Content-Type": "application/json",
+        "xi-api-key": eleven_labs_api_key
+    }
+
+    response = requests.post(url, json=data, headers=headers)
+
+    if response.status_code == 200 and response.content:
+        with open('ai_voice.mp3', 'wb') as f:
+            f.write(response.content)
+        playsound('ai_voice.mp3')
+        return response.content
 
 # Web GUI
 from flask import Flask, render_template, request
@@ -49,6 +77,7 @@ def home():
 def send_message():
     human_input=request.form['human_input']
     message = ai_response(human_input)
+    voice_message(message)
     return message
 
 if __name__ == '__main__':
