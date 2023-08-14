@@ -1,4 +1,4 @@
 .vscode
 venv
 .env
-/*.mp3
+audio/*.mp3
