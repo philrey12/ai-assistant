@@ -3,12 +3,13 @@ from langchain.memory import ConversationBufferWindowMemory
 import os
 from dotenv import find_dotenv, load_dotenv
 import requests
+from datetime import datetime
 from playsound import playsound
 
 load_dotenv(find_dotenv())
 
-eleven_labs_api_key = os.getenv('ELEVEN_LABS_API_KEY')
 voice_id = os.getenv('VOICE_ID')
+eleven_labs_api_key = os.getenv('ELEVEN_LABS_API_KEY')
 
 def ai_response(human_input):
     template = """
@@ -17,11 +18,11 @@ def ai_response(human_input):
         You'll speak with warmth and affection, radiating a kind and gentle demeanor. 
         Your responses will be filled with tender expressions, creating a nurturing and caring atmosphere in our conversation. 
         You'll interact with a genuine sweetness, using affectionate language to create a delightful experience. 
-        Don't be overly enthusiastic, don't be cringe, and don't be too boring. 
+        Don't be overly enthusiastic, don't be cringe, and don't be too boring.
 
         {history}
         Me: {human_input}
-        Fia: 
+        AI: 
         """
     prompt = PromptTemplate(
         input_variables={'history', 'human_input'},
@@ -59,9 +60,11 @@ def voice_message(message):
     response = requests.post(url, json=data, headers=headers)
 
     if response.status_code == 200 and response.content:
-        with open('output.mp3', 'wb') as f:
+        ts = datetime.timestamp(datetime.now())
+
+        with open(f'audio/{ts}.mp3', 'wb') as f:
             f.write(response.content)
-        playsound('output.mp3')
+        playsound(f'audio/{ts}.mp3')
         return response.content
 
 # Web GUI
