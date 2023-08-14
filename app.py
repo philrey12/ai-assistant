@@ -7,8 +7,8 @@ from playsound import playsound
 
 load_dotenv(find_dotenv())
 
-eleven_labs_api_key = ''
-eleven_labs_api_key == os.getenv('ELEVEN_LABS_API_KEY')
+eleven_labs_api_key = os.getenv('ELEVEN_LABS_API_KEY')
+voice_id = os.getenv('VOICE_ID')
 
 def ai_response(human_input):
     template = """
@@ -39,7 +39,7 @@ def ai_response(human_input):
     return output
 
 def voice_message(message):
-    url = "https://api.elevenlabs.io/v1/text-to-speech/bZkifB8UZDN5bvyYpnsD"
+    url = "https://api.elevenlabs.io/v1/text-to-speech/" + voice_id
 
     data = {
         "text": message,
@@ -59,9 +59,9 @@ def voice_message(message):
     response = requests.post(url, json=data, headers=headers)
 
     if response.status_code == 200 and response.content:
-        with open('ai_voice.mp3', 'wb') as f:
+        with open('output.mp3', 'wb') as f:
             f.write(response.content)
-        playsound('ai_voice.mp3')
+        playsound('output.mp3')
         return response.content
 
 # Web GUI
