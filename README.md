@@ -1,2 +1,2 @@
-# ai-companion
+# ai-assistant
 A simple chatbot
